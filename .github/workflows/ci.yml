@@ -12,7 +12,6 @@ concurrency:
 
 env:
   NODE_VERSION: '20'
-  PNPM_VERSION: '9'
 
 jobs:
   quality:
@@ -22,31 +21,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Generate Prisma client
-        run: pnpm db:generate
+        run: npm run db:generate
 
       - name: TypeScript check
-        run: pnpm type-check
+        run: npm run type-check
 
       - name: Lint
-        run: pnpm lint
+        run: npm run lint
 
       - name: Unit tests
-        run: pnpm test:unit:coverage
+        run: npm run test:unit:coverage
         env:
           DATABASE_URL: 'postgresql://test:test@localhost:5432/test'
           NEXTAUTH_SECRET: 'ci-test-secret-not-for-production'
@@ -60,7 +54,7 @@ jobs:
           retention-days: 7
 
       - name: Build
-        run: pnpm build
+        run: npm run build
         env:
           DATABASE_URL: 'postgresql://test:test@localhost:5432/test'
           NEXTAUTH_SECRET: 'ci-test-secret-not-for-production'
@@ -72,22 +66,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Audit dependencies
-        run: pnpm audit --audit-level high
+        run: npm audit --audit-level high
         continue-on-error: true
 
       - name: Check licenses
@@ -112,7 +101,6 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-
       redis:
         image: redis:7-alpine
         options: >-
@@ -122,50 +110,44 @@ jobs:
           --health-retries 5
         ports:
           - 6379:6379
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium
 
       - name: Generate Prisma client
-        run: pnpm db:generate
+        run: npm run db:generate
 
       - name: Run migrations
-        run: pnpm db:migrate:deploy
+        run: npm run db:migrate:deploy
         env:
           DATABASE_URL: postgresql://pvtest:pvtest_password@localhost:5432/pvopshub_test
 
       - name: Seed test data
-        run: pnpm db:seed:test
+        run: npm run db:seed:test
         env:
           DATABASE_URL: postgresql://pvtest:pvtest_password@localhost:5432/pvopshub_test
 
       - name: Build application
-        run: pnpm build
+        run: npm run build
         env:
           DATABASE_URL: postgresql://pvtest:pvtest_password@localhost:5432/pvopshub_test
           NEXTAUTH_SECRET: e2e-test-secret-not-for-production
           REDIS_URL: redis://localhost:6379
 
       - name: Run E2E tests
-        run: pnpm test:e2e
+        run: npm run test:e2e
         env:
           DATABASE_URL: postgresql://pvtest:pvtest_password@localhost:5432/pvopshub_test
           NEXTAUTH_SECRET: e2e-test-secret-not-for-production
@@ -221,22 +203,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Run production migrations
-        run: pnpm db:migrate:deploy
+        run: npm run db:migrate:deploy
         env:
           DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
 
