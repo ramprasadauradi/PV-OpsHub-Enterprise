@@ -4,7 +4,7 @@
  * Run: pnpm db:seed or npx tsx prisma/seed.ts
  */
 
-import { PrismaClient, Role } from '@prisma/client'
+import { PrismaClient, Role , Prisma} from '@prisma/client'
 import { hashSync } from 'bcryptjs'
 import {
     TENANTS,
@@ -26,7 +26,7 @@ function log(msg: string) {
     console.log(`[${new Date().toISOString()}] ${msg}`)
 }
 
-function generateSnapshotData(snType: string, month: string): Record<string, unknown> {
+function generateSnapshotData(snType: string, month: string): Prisma.InputJsonValue {
     const monthNum = parseInt(month.split('-')[1])
     const base = 800 + Math.floor(Math.random() * 400)
     if (snType === 'volumeTrend') {
