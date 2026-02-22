@@ -5,6 +5,8 @@
 
 # testing
 /coverage
+/playwright-report
+/test-results
 
 # next.js
 /.next/
@@ -38,8 +40,9 @@ next-env.d.ts
 /prisma/dev.db
 /prisma/dev.db-journal
 
-# PV-OpsHub specific
+# build artifacts
 tsc_output.txt
 build_output.txt
+
+# PV-OpsHub specific
 /brain/
-/__snapshots__/
