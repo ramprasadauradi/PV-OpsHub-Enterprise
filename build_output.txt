@@ -1,0 +1,113 @@
+﻿node.exe :  ΓÜá Attempted to load 
+@next/swc-win32-x64-msvc, but an error 
+occurred: \\?\C:\Users\rampr\Downloads\PV_opshub
+_v1.0_Claude\node_modules\@next\swc-win32-x64-ms
+vc\next-swc.win32-x64-msvc.node is not a valid 
+Win32 application.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" 
+"C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ( Γ 
+   Üá Attempted ...32 application.:String) [],  
+   RemoteException
+    + FullyQualifiedErrorId : NativeCommandErro 
+   r
+ 
+\\?\C:\Users\rampr\Downloads\PV_opshub_v1.0_Clau
+de\node_modules\@next\swc-win32-x64-msvc\next-sw
+c.win32-x64-msvc.node
+   Γû▓ Next.js 15.0.4
+   - Environments: .env.local, .env
+
+   Creating an optimized production build ...
+ ΓÜá Attempted to load 
+@next/swc-win32-x64-msvc, but an error 
+occurred: \\?\C:\Users\rampr\Downloads\PV_opshub
+_v1.0_Claude\node_modules\@next\swc-win32-x64-ms
+vc\next-swc.win32-x64-msvc.node is not a valid 
+Win32 application.
+\\?\C:\Users\rampr\Downloads\PV_opshub_v1.0_Clau
+de\node_modules\@next\swc-win32-x64-msvc\next-sw
+c.win32-x64-msvc.node
+ ΓÜá Attempted to load 
+@next/swc-win32-x64-msvc, but an error 
+occurred: \\?\C:\Users\rampr\Downloads\PV_opshub
+_v1.0_Claude\node_modules\@next\swc-win32-x64-ms
+vc\next-swc.win32-x64-msvc.node is not a valid 
+Win32 application.
+\\?\C:\Users\rampr\Downloads\PV_opshub_v1.0_Clau
+de\node_modules\@next\swc-win32-x64-msvc\next-sw
+c.win32-x64-msvc.node
+ ΓÜá Attempted to load 
+@next/swc-win32-x64-msvc, but an error 
+occurred: \\?\C:\Users\rampr\Downloads\PV_opshub
+_v1.0_Claude\node_modules\@next\swc-win32-x64-ms
+vc\next-swc.win32-x64-msvc.node is not a valid 
+Win32 application.
+\\?\C:\Users\rampr\Downloads\PV_opshub_v1.0_Clau
+de\node_modules\@next\swc-win32-x64-msvc\next-sw
+c.win32-x64-msvc.node
+ Γ£ô Compiled successfully
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+   Generating static pages (0/34) ...
+   Generating static pages (8/34) 
+   Generating static pages (16/34) 
+   Generating static pages (25/34) 
+ Γ£ô Generating static pages (34/34)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+Γöî ╞Æ /                                    208 B           100 kB
+Γö£ Γùï /_not-found                          900 B           101 kB
+Γö£ ╞Æ /admin/governance                    3.97 kB         111 kB
+Γö£ ╞Æ /admin/report-types                  4.04 kB         111 kB
+Γö£ ╞Æ /admin/sla-rules                     4.01 kB         111 kB
+Γö£ ╞Æ /admin/users                         3.84 kB         111 kB
+Γö£ ╞Æ /allocation                          9.27 kB         151 kB
+Γö£ ╞Æ /api/allocation/bulk                 208 B           100 kB
+Γö£ ╞Æ /api/allocation/hold                 208 B           100 kB
+Γö£ ╞Æ /api/allocation/suggest              208 B           100 kB
+Γö£ ╞Æ /api/audit                           208 B           100 kB
+Γö£ ╞Æ /api/auth/[...nextauth]              208 B           100 kB
+Γö£ ╞Æ /api/cases                           208 B           100 kB
+Γö£ ╞Æ /api/cases/[id]                      208 B           100 kB
+Γö£ ╞Æ /api/cases/[id]/allocate             208 B           100 kB
+Γö£ ╞Æ /api/cases/[id]/corrections          208 B           100 kB
+Γö£ ╞Æ /api/cases/[id]/stage                208 B           100 kB
+Γö£ ╞Æ /api/dashboard/manager               208 B           100 kB
+Γö£ ╞Æ /api/dashboard/project               208 B           100 kB
+Γö£ ╞Æ /api/dashboard/tl                    208 B           100 kB
+Γö£ ╞Æ /api/health                          208 B           100 kB
+Γö£ ╞Æ /api/metrics                         208 B           100 kB
+Γö£ ╞Æ /api/pipeline                        208 B           100 kB
+Γö£ ╞Æ /api/quality/corrections-matrix      208 B           100 kB
+Γö£ ╞Æ /api/search                          208 B           100 kB
+Γö£ ╞Æ /api/sla/calculate                   208 B           100 kB
+Γö£ ╞Æ /api/sla/forecast                    208 B           100 kB
+Γö£ ╞Æ /audit                               5.04 kB         147 kB
+Γö£ ╞Æ /cases                               5.21 kB         164 kB
+Γö£ ╞Æ /cases/[id]                          883 B           143 kB
+Γö£ ╞Æ /cases/pipeline                      2.01 kB         102 kB
+Γö£ ╞Æ /dashboard/manager                   3.4 kB          119 kB
+Γö£ ╞Æ /dashboard/project                   5.68 kB         121 kB
+Γö£ ╞Æ /dashboard/tl                        5.91 kB         127 kB
+Γö£ Γùï /login                               3.29 kB         114 kB
+Γö£ ╞Æ /quality/corrections                 5.27 kB         112 kB
+Γö£ ╞Æ /reports                             3.54 kB         111 kB
+Γöö ╞Æ /sla                                 3.11 kB         118 kB
++ First Load JS shared by all            100 kB
+  Γö£ chunks/1517-00e4f21eb21d510f.js      45.5 kB
+  Γö£ chunks/4bd1b696-064ecb9b6ab2b79c.js  52.5 kB
+  Γöö other shared chunks (total)          2.25 kB
+
+
+╞Æ Middleware                             42.1 kB
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+

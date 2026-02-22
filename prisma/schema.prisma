@@ -1,0 +1,548 @@
+﻿// prisma/schema.prisma
+// PV-OpsHub — Pharmacovigilance Operations Monitoring & Management Platform
+// PostgreSQL 16 with Row Level Security
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ═══════════════════════════════════════════
+// ENUMS
+// ═══════════════════════════════════════════
+
+enum Role {
+  SUPER_ADMIN
+  TENANT_ADMIN
+  PROJECT_MANAGER
+  QUALITY_MANAGER
+  OPS_MANAGER
+  TEAM_LEAD
+  PROCESSOR
+}
+
+enum Region {
+  INDIA
+  EU
+  US
+  APAC
+  GLOBAL
+}
+
+enum CaseCategory {
+  INITIAL
+  FOLLOW_UP
+}
+
+enum CaseComplexity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum CaseSource {
+  LP
+  CO
+}
+
+enum Seriousness {
+  FATAL
+  LIFE_THREATENING
+  SERIOUS
+  NON_SERIOUS
+}
+
+enum HAVAPType {
+  HA
+  VAP
+  NEITHER
+}
+
+enum WorkflowStage {
+  INTAKE
+  DE
+  QC
+  MR
+  SUBMISSION
+  COMPLETED
+}
+
+enum CaseStatus {
+  UNALLOCATED
+  ALLOCATED
+  IN_PROGRESS
+  ON_HOLD
+  COMPLETED
+}
+
+enum CorrectionCategory {
+  DATA_ENTRY
+  CODING
+  NARRATIVE
+  DUPLICATE
+  MISSING_FOLLOWUP
+  SLA_MISS
+  MR_RETURN
+}
+
+enum HoldType {
+  ALL
+  SPECIFIC
+}
+
+enum ReleaseMethod {
+  MANUAL
+  AUTO
+}
+
+enum TeamRole {
+  BOOKING_LEAD
+  PROCESSING_LEAD
+  MR_LEAD
+  SENIOR_PROCESSOR
+  JUNIOR_PROCESSOR
+  MID_PROCESSOR
+}
+
+enum Seniority {
+  SENIOR
+  MID
+  JUNIOR
+}
+
+// ═══════════════════════════════════════════
+// CORE MODELS
+// ═══════════════════════════════════════════
+
+model Tenant {
+  id                   String   @id @default(cuid())
+  name                 String
+  region               Region
+  timezone             String   @default("UTC")
+  holdAutoReleaseHours Int      @default(24)
+  maxReassignments     Int      @default(3)
+  refreshIntervalSec   Int      @default(15)
+  capaThreshold        Int      @default(5)
+  fpqMinThreshold      Float    @default(95.0)
+  isActive             Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  users             User[]
+  cases             Case[]
+  reportTypeConfigs ReportTypeConfig[]
+  slaRules          SLARuleConfig[]
+  allocationRules   AllocationRule[]
+  auditLogs         AuditLog[]
+  holdEvents        HoldEvent[]
+  capaRecords       CAPARecord[]
+  tenantConfig      TenantConfig?
+  clientProfile     ClientProfile?
+  projects          Project[]
+  workflowConfigs   WorkflowConfig[]
+  slaConfigs        SLAConfig[]
+  analyticsSnapshots AnalyticsSnapshot[]
+}
+
+model TenantConfig {
+  id                 String  @id @default(cuid())
+  tenantId           String  @unique
+  logoUrl            String?
+  primaryColor       String  @default("#2563EB")
+  dashboardLayout    Json?
+  notificationEmail  String?
+  slackWebhookUrl    String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  tenant             Tenant  @relation(fields: [tenantId], references: [id])
+}
+
+model User {
+  id              String    @id @default(cuid())
+  tenantId        String
+  email           String
+  name            String
+  role            Role
+  dailyCaseLimit  Int       @default(20)
+  timezone        String    @default("UTC")
+  isActive        Boolean   @default(true)
+  passwordHash    String
+  lastLoginAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  tenant          Tenant    @relation(fields: [tenantId], references: [id])
+  allocatedCases  CaseAllocation[] @relation("AssignedTo")
+  conductedAllocs CaseAllocation[] @relation("AllocatedBy")
+  corrections     Correction[]
+  auditLogs       AuditLog[]
+  stageEvents     CaseStageEvent[]
+  holdEvents      HoldEvent[]
+  capaRecords     CAPARecord[]
+  projectMembers  ProjectMember[]
+
+  @@unique([tenantId, email])
+  @@index([tenantId, role])
+  @@index([tenantId, isActive])
+}
+
+model Case {
+  id                      String         @id @default(cuid())
+  tenantId                String
+  referenceId             String
+  caseNumber              String
+  reportType              String
+  caseCategory            CaseCategory
+  caseComplexity          CaseComplexity
+  country                 String
+  therapeuticArea         String
+  productName             String
+  source                  CaseSource
+  seriousness             Seriousness
+  haVapIndicator          HAVAPType
+  isDevice                Boolean        @default(false)
+  isPregnancy             Boolean        @default(false)
+  manufacturerReceiptDate DateTime
+  centralReceiptDate      DateTime
+  currentStage            WorkflowStage  @default(INTAKE)
+  currentStatus           CaseStatus     @default(UNALLOCATED)
+  slaDeadline             DateTime
+  slaRiskScore            Float          @default(0)
+  isHeld                  Boolean        @default(false)
+  heldAt                  DateTime?
+  holdReason              String?
+  assignedToId            String?
+  projectId               String?
+  notes                   String?
+  createdAt               DateTime       @default(now())
+  updatedAt               DateTime       @updatedAt
+
+  tenant                  Tenant         @relation(fields: [tenantId], references: [id])
+  project                 Project?       @relation(fields: [projectId], references: [id])
+  allocations             CaseAllocation[]
+  corrections             Correction[]
+  stageEvents             CaseStageEvent[]
+  holdEvents              HoldEvent[]
+
+  @@unique([tenantId, referenceId])
+  @@index([tenantId, currentStatus])
+  @@index([tenantId, haVapIndicator])
+  @@index([tenantId, slaDeadline])
+  @@index([tenantId, isHeld])
+  @@index([tenantId, currentStage])
+  @@index([tenantId, assignedToId])
+  @@index([tenantId, slaRiskScore])
+  @@index([tenantId, projectId])
+  @@index([tenantId, createdAt])
+}
+
+model CaseAllocation {
+  id            String    @id @default(cuid())
+  tenantId      String
+  caseId        String
+  assignedToId  String
+  allocatedById String
+  allocatorRole Role
+  allocationNum Int
+  criteria      Json
+  isActive      Boolean   @default(true)
+  allocatedAt   DateTime  @default(now())
+
+  case          Case      @relation(fields: [caseId], references: [id])
+  assignedTo    User      @relation("AssignedTo", fields: [assignedToId], references: [id])
+  allocatedBy   User      @relation("AllocatedBy", fields: [allocatedById], references: [id])
+
+  @@index([tenantId, caseId])
+  @@index([tenantId, assignedToId])
+  @@index([tenantId, isActive])
+}
+
+model CaseStageEvent {
+  id            String         @id @default(cuid())
+  tenantId      String
+  caseId        String
+  fromStage     WorkflowStage?
+  toStage       WorkflowStage
+  performedById String
+  notes         String?
+  clockStop     Boolean        @default(false)
+  clockResume   Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+
+  case          Case           @relation(fields: [caseId], references: [id])
+  performedBy   User           @relation(fields: [performedById], references: [id])
+
+  @@index([tenantId, caseId])
+}
+
+model Correction {
+  id              String             @id @default(cuid())
+  tenantId        String
+  caseId          String
+  correctedById   String
+  stage           WorkflowStage
+  category        CorrectionCategory
+  description     String
+  isResolved      Boolean            @default(false)
+  resolvedAt      DateTime?
+  capaTriggered   Boolean            @default(false)
+  capaId          String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  case            Case               @relation(fields: [caseId], references: [id])
+  correctedBy     User               @relation(fields: [correctedById], references: [id])
+  capa            CAPARecord?        @relation(fields: [capaId], references: [id])
+
+  @@index([tenantId, caseId])
+  @@index([tenantId, correctedById])
+  @@index([tenantId, category])
+  @@index([tenantId, capaTriggered])
+  @@index([tenantId, createdAt])
+}
+
+model CAPARecord {
+  id              String      @id @default(cuid())
+  tenantId        String
+  triggeredById   String
+  triggerCategory CorrectionCategory
+  description     String
+  rootCause       String?
+  actionPlan      String?
+  targetDate      DateTime?
+  isResolved      Boolean     @default(false)
+  resolvedAt      DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  tenant          Tenant      @relation(fields: [tenantId], references: [id])
+  triggeredBy     User        @relation(fields: [triggeredById], references: [id])
+  corrections     Correction[]
+
+  @@index([tenantId, isResolved])
+}
+
+model HoldEvent {
+  id              String         @id @default(cuid())
+  tenantId        String
+  caseId          String?
+  initiatedById   String
+  holdType        HoldType
+  releaseMethod   ReleaseMethod?
+  heldAt          DateTime       @default(now())
+  releasedAt      DateTime?
+  autoReleaseAt   DateTime?
+  notes           String?
+
+  tenant          Tenant         @relation(fields: [tenantId], references: [id])
+  case            Case?          @relation(fields: [caseId], references: [id])
+  initiatedBy     User           @relation(fields: [initiatedById], references: [id])
+
+  @@index([tenantId, releasedAt])
+  @@index([tenantId, autoReleaseAt])
+}
+
+model ReportTypeConfig {
+  id            String    @id @default(cuid())
+  tenantId      String
+  code          String
+  label         String
+  isEnabled     Boolean   @default(true)
+  isCustom      Boolean   @default(false)
+  sortOrder     Int       @default(0)
+  effectiveDate DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  tenant        Tenant    @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, code])
+  @@index([tenantId, isEnabled])
+}
+
+model SLARuleConfig {
+  id              String    @id @default(cuid())
+  tenantId        String
+  country         String
+  licensePartner  String    @default("DEFAULT")
+  reportType      String    @default("ALL")
+  seriousness     String    @default("ALL")
+  submissionDays  Int
+  useBusinessDays Boolean   @default(false)
+  isHACase        Boolean   @default(false)
+  effectiveDate   DateTime
+  expiryDate      DateTime?
+  version         Int       @default(1)
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+
+  tenant          Tenant    @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId, country, licensePartner])
+  @@index([tenantId, isActive])
+}
+
+model AllocationRule {
+  id              String    @id @default(cuid())
+  tenantId        String
+  name            String
+  priority        Int       @default(0)
+  conditions      Json
+  targetUserIds   String[]
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  tenant          Tenant    @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId, isActive])
+}
+
+model AuditLog {
+  id          String    @id @default(cuid())
+  tenantId    String
+  userId      String
+  action      String
+  entityType  String
+  entityId    String
+  before      Json?
+  after       Json?
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime  @default(now())
+
+  tenant      Tenant    @relation(fields: [tenantId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@index([tenantId, entityType, entityId])
+  @@index([tenantId, userId])
+  @@index([tenantId, createdAt])
+  @@index([tenantId, action])
+}
+
+// ═══════════════════════════════════════════
+// ENTERPRISE EXPANSION MODELS
+// ═══════════════════════════════════════════
+
+model ClientProfile {
+  id               String    @id @default(cuid())
+  tenantId         String    @unique
+  clientCode       String
+  therapeuticFocus String[]
+  contractStart    DateTime
+  contractEnd      DateTime?
+  totalAnnualCases Int       @default(0)
+  region           String    @default("GLOBAL")
+  primaryContact   String?
+  notes            String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  tenant           Tenant    @relation(fields: [tenantId], references: [id])
+}
+
+model Project {
+  id            String    @id @default(cuid())
+  tenantId      String
+  name          String
+  clientCode    String
+  isActive      Boolean   @default(true)
+  startDate     DateTime
+  endDate       DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  tenant        Tenant    @relation(fields: [tenantId], references: [id])
+  members       ProjectMember[]
+  cases         Case[]
+
+  @@index([tenantId, isActive])
+}
+
+model ProjectMember {
+  id          String    @id @default(cuid())
+  tenantId    String
+  projectId   String
+  userId      String
+  teamRole    TeamRole
+  teamName    String
+  seniority   Seniority
+  joinedAt    DateTime  @default(now())
+
+  project     Project   @relation(fields: [projectId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@unique([projectId, userId])
+  @@index([tenantId, projectId, teamRole])
+}
+
+model WorkflowConfig {
+  id            String    @id @default(cuid())
+  tenantId      String
+  stageCode     String
+  stageLabel    String
+  stageOrder    Int
+  isEnabled     Boolean   @default(true)
+  color         String    @default("#6b7280")
+  slaDays       Int?
+  isRequired    Boolean   @default(true)
+  description   String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  tenant        Tenant    @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, stageCode])
+  @@index([tenantId, stageOrder])
+}
+
+model SLAConfig {
+  id                String      @id @default(cuid())
+  tenantId          String
+  configName        String
+  country           String      @default("DEFAULT")
+  licensePartner    String      @default("DEFAULT")
+  reportType        String      @default("ALL")
+  seriousness       String      @default("ALL")
+  haVapIndicator    String      @default("ALL")
+  submissionDays    Int
+  useBusinessDays   Boolean     @default(false)
+  clockStopAllowed  Boolean     @default(true)
+  maxClockStops     Int         @default(3)
+  priority          Int         @default(0)
+  effectiveDate     DateTime
+  expiryDate        DateTime?
+  version           Int         @default(1)
+  isActive          Boolean     @default(true)
+  notes             String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  tenant            Tenant      @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId, country, licensePartner, haVapIndicator])
+  @@index([tenantId, isActive, effectiveDate])
+}
+
+model AnalyticsSnapshot {
+  id            String    @id @default(cuid())
+  tenantId      String
+  projectId     String?
+  snapshotType  String
+  period        String
+  data          Json
+  computedAt    DateTime  @default(now())
+  expiresAt     DateTime
+
+  tenant        Tenant    @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId, snapshotType, period])
+  @@index([tenantId, expiresAt])
+}

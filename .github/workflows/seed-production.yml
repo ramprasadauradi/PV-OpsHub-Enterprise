@@ -1,0 +1,69 @@
+name: Seed Production Data
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      case_count:
+        description: 'Number of cases per tenant (default: 10000)'
+        required: false
+        default: '10000'
+      confirm:
+        description: 'Type CONFIRM to proceed'
+        required: true
+
+jobs:
+  seed:
+    name: Seed ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
+    steps:
+      - name: Validate confirmation
+        run: |
+          if [ "${{ inputs.confirm }}" != "CONFIRM" ]; then
+            echo "❌ You must type CONFIRM to proceed"
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: '9'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm db:generate
+
+      - name: Run migrations
+        run: pnpm db:migrate:deploy
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Run seed
+        run: pnpm db:seed
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SEED_CASE_COUNT: ${{ inputs.case_count }}
+
+      - name: Verify seed
+        run: |
+          echo "Seed complete for ${{ inputs.environment }}"
+          echo "Cases per tenant: ${{ inputs.case_count }}"
