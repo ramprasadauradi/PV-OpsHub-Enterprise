@@ -106,8 +106,8 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Generate Prisma client
         run: npm run db:generate
-      - name: Run migrations
-        run: npm run db:migrate:deploy
+      - name: Push database schema
+        run: npx prisma db push --force-reset --accept-data-loss
         env:
           DATABASE_URL: postgresql://pvtest:pvtest_password@localhost:5432/pvopshub_test
       - name: Seed test data
