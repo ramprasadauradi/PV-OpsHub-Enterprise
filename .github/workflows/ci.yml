@@ -1,18 +1,14 @@
 name: CI
-
 on:
   push:
     branches: [main, develop, 'release/**']
   pull_request:
     branches: [main]
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-
 env:
   NODE_VERSION: '20'
-
 jobs:
   quality:
     name: Quality Checks
@@ -20,69 +16,55 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-
       - name: Install dependencies
-        run: npm ci
-
+        run: npm install
       - name: Generate Prisma client
         run: npm run db:generate
-
       - name: TypeScript check
         run: npm run type-check
-
       - name: Lint
         run: npm run lint
-
       - name: Unit tests
         run: npm run test:unit:coverage
         env:
           DATABASE_URL: 'postgresql://test:test@localhost:5432/test'
           NEXTAUTH_SECRET: 'ci-test-secret-not-for-production'
           ENCRYPTION_KEY: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
-
       - name: Upload coverage
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: coverage/
           retention-days: 7
-
       - name: Build
         run: npm run build
         env:
           DATABASE_URL: 'postgresql://test:test@localhost:5432/test'
           NEXTAUTH_SECRET: 'ci-test-secret-not-for-production'
-
   security:
     name: Security Scan
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-
       - name: Install dependencies
-        run: npm ci
-
+        run: npm install
       - name: Audit dependencies
         run: npm audit --audit-level high
         continue-on-error: true
-
       - name: Check licenses
         run: npx license-checker --failOn 'GPL-3.0;AGPL-3.0' --summary
         continue-on-error: true
-
   e2e:
     name: E2E Tests
     needs: [quality]
@@ -113,39 +95,31 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-
       - name: Install dependencies
-        run: npm ci
-
+        run: npm install
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
-
       - name: Generate Prisma client
         run: npm run db:generate
-
       - name: Run migrations
         run: npm run db:migrate:deploy
         env:
           DATABASE_URL: postgresql://pvtest:pvtest_password@localhost:5432/pvopshub_test
-
       - name: Seed test data
         run: npm run db:seed:test
         env:
           DATABASE_URL: postgresql://pvtest:pvtest_password@localhost:5432/pvopshub_test
-
       - name: Build application
         run: npm run build
         env:
           DATABASE_URL: postgresql://pvtest:pvtest_password@localhost:5432/pvopshub_test
           NEXTAUTH_SECRET: e2e-test-secret-not-for-production
           REDIS_URL: redis://localhost:6379
-
       - name: Run E2E tests
         run: npm run test:e2e
         env:
@@ -153,7 +127,6 @@ jobs:
           NEXTAUTH_SECRET: e2e-test-secret-not-for-production
           REDIS_URL: redis://localhost:6379
           NEXTAUTH_URL: http://localhost:3000
-
       - name: Upload E2E report
         if: always()
         uses: actions/upload-artifact@v4
@@ -161,7 +134,6 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
-
   deploy-staging:
     name: Deploy Staging
     needs: [quality, e2e]
@@ -173,7 +145,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Deploy to Vercel (Preview)
         id: deploy
         uses: amondnet/vercel-action@v25
@@ -181,7 +152,6 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-
       - name: Smoke test staging
         run: |
           sleep 30
@@ -191,7 +161,6 @@ jobs:
             exit 1
           fi
           echo "Staging healthy"
-
   deploy-production:
     name: Deploy Production
     needs: [deploy-staging]
@@ -202,21 +171,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-
       - name: Install dependencies
-        run: npm ci
-
+        run: npm install
       - name: Run production migrations
         run: npm run db:migrate:deploy
         env:
           DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
-
       - name: Deploy to Vercel (Production)
         id: deploy
         uses: amondnet/vercel-action@v25
@@ -225,7 +190,6 @@ jobs:
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-args: '--prod'
-
       - name: Post-deploy health check
         run: |
           for i in {1..6}; do
