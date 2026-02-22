@@ -264,7 +264,7 @@ async function computeProductivityMetrics(tenantId: string) {
     for (const a of allocations) allocByUser[a.assignedToId] = (allocByUser[a.assignedToId] || 0) + 1
     for (const c of corrections) corrByUser[c.correctedById] = (corrByUser[c.correctedById] || 0) + 1
 
-    return users.slice(0, 20).map(u => ({
+    return users.slice(0, 20).map((u: any) => ({
         name: u.name,
         cases: allocByUser[u.id] || 0,
         corrections: corrByUser[u.id] || 0,
@@ -285,12 +285,12 @@ async function computeWorkloadDistribution(tenantId: string) {
     for (const c of activeCases) {
         if (c.assignedToId) byUser[c.assignedToId] = (byUser[c.assignedToId] || 0) + 1
     }
-    return users.map(u => ({
+    return users.map((u: any) => ({
         name: u.name,
         current: byUser[u.id] || 0,
         limit: u.dailyCaseLimit,
-        utilization: Math.round(((byUser[u.id] || 0) / u.dailyCaseLimit) * 100),
-    })).sort((a, b) => b.utilization - a.utilization).slice(0, 20)
+        utilization: Math.round(((byUser[u.id] || 0) / (u.dailyCaseLimit || 1)) * 100),
+    })).sort((a: any, b: any) => b.utilization - a.utilization).slice(0, 20)
 }
 
 async function computeSLABreach(tenantId: string) {
@@ -317,7 +317,7 @@ async function computeAgingFunnel(tenantId: string) {
         select: { createdAt: true },
     })
     return buckets.map(bucket => {
-        const count = activeCases.filter(c => {
+        const count = activeCases.filter((c: any) => {
             const days = Math.floor((now.getTime() - c.createdAt.getTime()) / (1000 * 60 * 60 * 24))
             return days >= bucket.min && days <= bucket.max
         }).length

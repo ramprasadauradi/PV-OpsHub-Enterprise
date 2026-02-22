@@ -26,35 +26,40 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(dashboard)/loading.js"
     ],
-    "/(dashboard)/dashboard/tl/page": [
+    "/(dashboard)/dashboard/manager/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/dashboard/tl/page.js"
+      "static/chunks/app/(dashboard)/dashboard/manager/page.js"
     ],
-    "/(auth)/layout": [
+    "/api/dashboard/manager/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(auth)/layout.js"
-    ],
-    "/(auth)/login/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(auth)/login/page.js"
+      "static/chunks/app/api/dashboard/manager/route.js"
     ],
     "/api/auth/[...nextauth]/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/api/auth/[...nextauth]/route.js"
     ],
-    "/(dashboard)/admin/users/page": [
+    "/(dashboard)/dashboard/project/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/admin/users/page.js"
+      "static/chunks/app/(dashboard)/dashboard/project/page.js"
     ],
-    "/api/admin/users/route": [
+    "/api/dashboard/project/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/api/admin/users/route.js"
+      "static/chunks/app/api/dashboard/project/route.js"
+    ],
+    "/(dashboard)/cases/loading": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(dashboard)/cases/loading.js"
+    ],
+    "/(dashboard)/cases/pipeline/loading": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(dashboard)/cases/pipeline/loading.js"
     ],
     "/(dashboard)/cases/pipeline/page": [
       "static/chunks/webpack.js",
@@ -66,60 +71,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/api/pipeline/route.js"
     ],
-    "/(dashboard)/cases/page": [
+    "/(dashboard)/quality/corrections/loading": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/cases/page.js"
-    ],
-    "/api/cases/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/cases/route.js"
-    ],
-    "/api/cases/[id]/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/cases/[id]/route.js"
-    ],
-    "/(dashboard)/allocation/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/allocation/page.js"
-    ],
-    "/api/allocation/hold/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/allocation/hold/route.js"
-    ],
-    "/api/allocation/suggest/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/allocation/suggest/route.js"
-    ],
-    "/api/dashboard/tl/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/dashboard/tl/route.js"
-    ],
-    "/(dashboard)/dashboard/manager/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/dashboard/manager/page.js"
-    ],
-    "/api/dashboard/manager/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/dashboard/manager/route.js"
-    ],
-    "/(dashboard)/dashboard/project/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/dashboard/project/page.js"
-    ],
-    "/api/dashboard/project/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/dashboard/project/route.js"
+      "static/chunks/app/(dashboard)/quality/corrections/loading.js"
     ],
     "/(dashboard)/quality/corrections/page": [
       "static/chunks/webpack.js",
@@ -136,70 +91,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/api/quality/corrections/route.js"
     ],
-    "/(dashboard)/sla/page": [
+    "/(dashboard)/cases/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/sla/page.js"
-    ],
-    "/api/sla/forecast/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/sla/forecast/route.js"
-    ],
-    "/api/sla/calculate/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/sla/calculate/route.js"
-    ],
-    "/(dashboard)/reports/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/reports/page.js"
-    ],
-    "/(dashboard)/admin/report-types/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/admin/report-types/page.js"
-    ],
-    "/(dashboard)/admin/sla-rules/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/admin/sla-rules/page.js"
-    ],
-    "/(dashboard)/admin/governance/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/admin/governance/page.js"
-    ],
-    "/api/admin/governance/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/admin/governance/route.js"
-    ],
-    "/(dashboard)/audit/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/audit/page.js"
-    ],
-    "/api/audit/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/audit/route.js"
-    ],
-    "/(dashboard)/cases/loading": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/cases/loading.js"
-    ],
-    "/(dashboard)/cases/pipeline/loading": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/cases/pipeline/loading.js"
-    ],
-    "/(dashboard)/quality/corrections/loading": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/quality/corrections/loading.js"
+      "static/chunks/app/(dashboard)/cases/page.js"
     ]
   }
 }

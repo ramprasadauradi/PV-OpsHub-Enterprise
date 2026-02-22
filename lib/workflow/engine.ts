@@ -35,7 +35,7 @@ export async function getActiveStages(tenantId: string): Promise<WorkflowStageIn
     })
 
     const stages = configs.length > 0
-        ? configs.map(c => ({
+        ? configs.map((c: any) => ({
             stageCode: c.stageCode,
             stageLabel: c.stageLabel,
             stageOrder: c.stageOrder,
@@ -58,7 +58,7 @@ export async function getAllStages(tenantId: string): Promise<WorkflowStageInfo[
     })
 
     return configs.length > 0
-        ? configs.map(c => ({
+        ? configs.map((c: any) => ({
             stageCode: c.stageCode,
             stageLabel: c.stageLabel,
             stageOrder: c.stageOrder,

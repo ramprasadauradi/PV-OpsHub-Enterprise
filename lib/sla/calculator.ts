@@ -38,7 +38,7 @@ export async function calculateSLA(params: SLAParams): Promise<SLAResult> {
 
     // Step 2: Score each config for specificity match
     const scored = configs
-        .map(config => {
+        .map((config: any) => {
             let score = config.priority * 1000
 
             const matchCountry = config.country === params.country
@@ -65,7 +65,7 @@ export async function calculateSLA(params: SLAParams): Promise<SLAResult> {
 
             return { config, score }
         })
-        .filter(Boolean) as { config: (typeof configs)[number]; score: number }[]
+        .filter((s: any): s is { config: any; score: number } => s !== null)
 
     if (!scored.length) {
         // Hardcoded safety defaults
@@ -80,9 +80,9 @@ export async function calculateSLA(params: SLAParams): Promise<SLAResult> {
     }
 
     // Step 3: Among top-scoring configs, use SHORTEST deadline (safest)
-    const maxScore = Math.max(...scored.map(s => s.score))
-    const candidates = scored.filter(s => s.score === maxScore)
-    const winner = candidates.reduce((a, b) =>
+    const maxScore = Math.max(...scored.map((s: any) => s.score))
+    const candidates = scored.filter((s: any) => s.score === maxScore)
+    const winner = candidates.reduce((a: any, b: any) =>
         a.config.submissionDays <= b.config.submissionDays ? a : b
     )
 
@@ -134,7 +134,7 @@ function buildResult(
     }
 }
 
-function addBusinessDays(date: Date, days: number): Date {
+export function addBusinessDays(date: Date, days: number): Date {
     let result = new Date(date)
     let added = 0
     while (added < days) {
@@ -142,6 +142,13 @@ function addBusinessDays(date: Date, days: number): Date {
         if (!isWeekend(result)) added++
     }
     return result
+}
+
+export function calculateRiskScore(daysRemaining: number, totalDays: number): number {
+    if (daysRemaining < 0) return 100
+    if (daysRemaining < 3) return 80 + Math.round(((3 - daysRemaining) / 3) * 20)
+    if (daysRemaining < 7) return 50 + Math.round(((7 - daysRemaining) / 4) * 30)
+    return Math.max(0, 50 - Math.round((daysRemaining / totalDays) * 50))
 }
 
 // Convenience function for simple SLA queries using the old SLARuleConfig model

@@ -1,7 +1,7 @@
 {
   "/(dashboard)/dashboard/manager/page": "app/(dashboard)/dashboard/manager/page.js",
-  "/(dashboard)/dashboard/project/page": "app/(dashboard)/dashboard/project/page.js",
-  "/(dashboard)/dashboard/tl/page": "app/(dashboard)/dashboard/tl/page.js",
   "/(dashboard)/cases/pipeline/page": "app/(dashboard)/cases/pipeline/page.js",
-  "/(dashboard)/quality/corrections/page": "app/(dashboard)/quality/corrections/page.js"
+  "/(dashboard)/quality/corrections/page": "app/(dashboard)/quality/corrections/page.js",
+  "/(dashboard)/cases/page": "app/(dashboard)/cases/page.js",
+  "/(dashboard)/dashboard/project/page": "app/(dashboard)/dashboard/project/page.js"
 }
